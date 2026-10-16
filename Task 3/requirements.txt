@@ -1,0 +1,36 @@
+# CUDA 12.8 builds of torch for the H100 server; other packages still come from PyPI.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+### API ###
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+python-multipart==0.0.32
+
+### Settings and logging ###
+pydantic-settings==2.10.1
+loguru==0.7.3
+
+### Models: embeddings, reranker, LLM ###
+torch==2.8.0
+sentence-transformers==5.1.2
+huggingface-hub==0.35.3
+ollama==0.6.1
+numpy==2.5.4
+
+### Document extraction ###
+pypdf==6.19.0
+cryptography==50.0.2
+python-docx==1.2.0
+python-pptx==1.0.2
+openpyxl==3.1.5
+
+### Storage: PostgreSQL/pgvector and S3 ###
+psycopg[binary]==3.2.9
+psycopg-pool==3.3.3
+pgvector==0.4.1
+boto3==1.40.18
+
+### Tests ###
+pytest==8.4.1
+httpx==0.28.1
+reportlab==4.4.3
