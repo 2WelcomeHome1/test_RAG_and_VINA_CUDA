@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Builds test_gyration.cu twice and checks both builds:
-#   base  - inc/cuda/mutate_conf.cuh taken from BASE_REF (the unfixed upstream code);
+#   base  - bundled baseline/mutate_conf.cuh, or a header taken from BASE_REF;
 #   fixed - inc/cuda/mutate_conf.cuh from the working tree.
 #
-# Usage:  BASE_REF=<commit> ./run_test.sh      or      ./run_test.sh <commit>
+# Usage: ./run_test.sh (bundled baseline, no upstream Git history required)
+# Optional: BASE_REF=<commit> ./run_test.sh or ./run_test.sh <commit>
+# For a differently structured Git repository: BASE_HEADER_REL=<path-in-commit>.
 #   Verified upstream base: 7b09586a64025d06c854a63eee21268fba5bc8f0 (HPCLab-933/Vina-CUDA, master)
 # Optional env: NVCC (default nvcc), CUDA_ARCH (e.g. sm_86), COMPUTE_SANITIZER, BUILD_DIR.
 #
@@ -20,19 +22,25 @@ readonly SIZES=(16 31 32 55 127)
 die() { echo "ERROR: $*" >&2; exit "$EXIT_ERROR"; }
 
 BASE_REF="${1:-${BASE_REF:-}}"
-[ -n "$BASE_REF" ] || die "BASE_REF is required (verified base: 7b09586a64025d06c854a63eee21268fba5bc8f0)"
-
-REPO_ROOT="$(git -C "$V11_DIR" rev-parse --show-toplevel 2>/dev/null)" || die "$V11_DIR is not inside a git repository"
-HEADER_REL="$(git -C "$V11_DIR" rev-parse --show-prefix)inc/cuda/mutate_conf.cuh" # path relative to the repo root
-BASE_COMMIT="$(git -C "$REPO_ROOT" rev-parse --verify --quiet "${BASE_REF}^{commit}")" || die "cannot resolve BASE_REF '$BASE_REF'"
-
+readonly VERIFIED_BASE=7b09586a64025d06c854a63eee21268fba5bc8f0
 BUILD_DIR="${BUILD_DIR:-$SCRIPT_DIR/build}"
 mkdir -p "$BUILD_DIR/base" || die "cannot create $BUILD_DIR"
-git -C "$REPO_ROOT" show "$BASE_COMMIT:$HEADER_REL" > "$BUILD_DIR/base/mutate_conf.cuh" \
-	|| die "git show $BASE_COMMIT:$HEADER_REL failed"
 
-echo "repo:       $REPO_ROOT"
-echo "base:       $BASE_COMMIT:$HEADER_REL"
+# Use the checked-in upstream header by default, also for the historical command.
+if [ -z "$BASE_REF" ] || [ "$BASE_REF" = "$VERIFIED_BASE" ]; then
+	cp "$SCRIPT_DIR/baseline/mutate_conf.cuh" "$BUILD_DIR/base/mutate_conf.cuh" \
+		|| die "cannot copy bundled baseline header"
+	BASE_SOURCE="bundled baseline from upstream $VERIFIED_BASE"
+else
+	REPO_ROOT="$(git -C "$V11_DIR" rev-parse --show-toplevel 2>/dev/null)" || die "$V11_DIR is not inside a git repository"
+	HEADER_REL="${BASE_HEADER_REL:-$(git -C "$V11_DIR" rev-parse --show-prefix)inc/cuda/mutate_conf.cuh}"
+	BASE_COMMIT="$(git -C "$REPO_ROOT" rev-parse --verify --quiet "${BASE_REF}^{commit}")" || die "cannot resolve BASE_REF '$BASE_REF'"
+	git -C "$REPO_ROOT" show "$BASE_COMMIT:$HEADER_REL" > "$BUILD_DIR/base/mutate_conf.cuh" \
+		|| die "git show $BASE_COMMIT:$HEADER_REL failed"
+	BASE_SOURCE="$BASE_COMMIT:$HEADER_REL"
+fi
+
+echo "base:       $BASE_SOURCE"
 echo "fixed:      working tree $V11_DIR/inc/cuda/mutate_conf.cuh"
 if cmp -s "$BUILD_DIR/base/mutate_conf.cuh" "$V11_DIR/inc/cuda/mutate_conf.cuh"; then
 	echo "warning:    working tree header is identical to base (fix not applied)"

@@ -1,1 +1,5 @@
 build/
+
+# Published, anonymized H100 evidence (override the global *.log rule)
+!results_h100/run_base.log
+!results_h100/run_fixed.log

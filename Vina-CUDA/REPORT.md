@@ -35,7 +35,7 @@
 
 Подготовка на 128 атомах укладывается в массивы теста, но приложение такой размер отвергает. Она задаёт состояние памяти; переиспользование памяти между блоками не моделируется.
 
-`run_test.sh` собирает один тест с заголовком из указанного исходного коммита и с заголовком рабочего дерева. Сохранены [логи H100](Vina-CUDA_v1.1/tests/gyration_shared_init/results_h100/).
+`run_test.sh` собирает один тест с сохранённым исходным заголовком из `tests/gyration_shared_init/baseline/` (точная копия upstream-коммита `7b09586a64025d06c854a63eee21268fba5bc8f0`) и с заголовком рабочего дерева. История upstream и доступ к сети для изолированного теста не нужны. Сохранены [логи H100](Vina-CUDA_v1.1/tests/gyration_shared_init/results_h100/).
 
 | Шаблон памяти | n | CPU-эталон | Исходная версия | Исправленная |
 |---|---:|---:|---:|---:|
@@ -70,8 +70,7 @@ Compute Sanitizer 2025.1.0.0 на сервере не поддерживает `
 GPU_INDEX=0
 CUDA_DEVICE_ORDER=PCI_BUS_ID CUDA_VISIBLE_DEVICES="$GPU_INDEX" \
 NVCC=/usr/local/cuda/bin/nvcc CUDA_ARCH=sm_90 \
-    Vina-CUDA_v1.1/tests/gyration_shared_init/run_test.sh \
-    7b09586a64025d06c854a63eee21268fba5bc8f0
+    bash Vina-CUDA_v1.1/tests/gyration_shared_init/run_test.sh
 ```
 
 Коды: `0` — ожидаемый дефект исходной версии и прохождение исправленной; `1` — несоответствие ожиданиям; `2` — ошибка; `77` — пропуск. На H100 основная проверка прошла, sanitizer — SKIP.
@@ -79,7 +78,8 @@ NVCC=/usr/local/cuda/bin/nvcc CUDA_ARCH=sm_90 \
 Для информационного сравнения полных запусков подготовлен [repro_app.sh](Vina-CUDA_v1.1/tests/app_determinism/repro_app.sh). Нужны две сборки приложения и Boost (в Makefile указан 1.77):
 
 ```bash
-git worktree add ../vina-base 7b09586a64025d06c854a63eee21268fba5bc8f0
+git clone https://github.com/HPCLab-933/Vina-CUDA.git ../vina-base
+git -C ../vina-base checkout --detach 7b09586a64025d06c854a63eee21268fba5bc8f0
 # Подготовить Boost: ./bootstrap.sh; ./b2 --with-program_options --with-system --with-filesystem --with-thread
 # В Makefile обеих копий задать WORK_DIR (каталог Vina-CUDA_v1.1),
 # BOOST_LIB_PATH и NVCC_COMPILER; выполнить make source в Vina-CUDA_v1.1.
