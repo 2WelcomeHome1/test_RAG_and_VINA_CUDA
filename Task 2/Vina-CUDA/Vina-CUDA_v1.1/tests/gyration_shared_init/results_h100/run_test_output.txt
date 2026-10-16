@@ -1,0 +1,36 @@
+repo:       ~/vina_test/Vina-CUDA
+base:       7b09586a64025d06c854a63eee21268fba5bc8f0:Vina-CUDA_v1.1/inc/cuda/mutate_conf.cuh
+fixed:      working tree ~/vina_test/Vina-CUDA/Vina-CUDA_v1.1/inc/cuda/mutate_conf.cuh
+
+=== base build: expecting the defect (zero tail MATCH, nonzero tail MISMATCH) ===
+DEVICE name="NVIDIA H100 PCIe" pci=00000000:07:00.0 cc=9.0 runtime=12080 driver=13000
+RESULT mode=prefill pattern=zero n=16 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=31 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=32 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=55 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=127 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=16 ref=1 got=2.905488 orig_model=2.905488 vs_ref=MISMATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=31 ref=1 got=2.729764 orig_model=2.729764 vs_ref=MISMATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=32 ref=1 got=2.720294 orig_model=2.720294 vs_ref=MISMATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=55 ref=1 got=2.465413 orig_model=2.465413 vs_ref=MISMATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=127 ref=1 got=1.04042 orig_model=1.04042 vs_ref=MISMATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+
+=== fixed build: expecting MATCH for every case ===
+DEVICE name="NVIDIA H100 PCIe" pci=00000000:07:00.0 cc=9.0 runtime=12080 driver=13000
+RESULT mode=prefill pattern=zero n=16 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=31 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=32 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=55 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=zero n=127 ref=1 got=1 orig_model=1 vs_ref=MATCH vs_orig_model=MATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=16 ref=1 got=1 orig_model=2.905488 vs_ref=MATCH vs_orig_model=MISMATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=31 ref=1 got=1 orig_model=2.729764 vs_ref=MATCH vs_orig_model=MISMATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=32 ref=1 got=1 orig_model=2.720294 vs_ref=MATCH vs_orig_model=MISMATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=55 ref=1 got=1 orig_model=2.465413 vs_ref=MATCH vs_orig_model=MISMATCH finite=yes threads_agree=yes
+RESULT mode=prefill pattern=nonzero n=127 ref=1 got=1 orig_model=1.04042 vs_ref=MATCH vs_orig_model=MISMATCH finite=yes threads_agree=yes
+
+=== summary ===
+[PASS] base:  expect the defect: nonzero tail changes R_g, zero tail does not
+[PASS] fixed: expect R_g = CPU reference for both tails and all sizes
+[SKIP] sanitizer base:  expect an uninitialized shared read in mutate_conf.cuh (this /usr/local/cuda-12.8/bin/compute-sanitizer has no '--initcheck-address-space shared')
+[SKIP] sanitizer fixed: expect no uninitialized shared reads (this /usr/local/cuda-12.8/bin/compute-sanitizer has no '--initcheck-address-space shared')
+logs: ~/vina_test/Vina-CUDA/Vina-CUDA_v1.1/tests/gyration_shared_init/build

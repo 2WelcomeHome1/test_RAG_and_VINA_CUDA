@@ -1,0 +1,5 @@
+date: 2026-10-14T19:41:59Z
+host: <gpu-server> (redacted)
+gpu:  NVIDIA H100 PCIe, 6011, 81559, 0, 00000000:07:00.0
+nvidia-smi driver: 580.105.08
+run_test.sh exit code: 0
